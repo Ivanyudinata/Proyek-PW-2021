@@ -67,7 +67,7 @@
                                             <a href="" class="text-decoration-none text-dark" style="font-size: 12px;">Bantuan</a>
                                         </li>
                                         <li class="list-inline-item">
-                                            <a href="" class="text-decoration-none text-dark" style="font-size: 12px;">masuk</a>
+                                            <a href="login.php" class="text-decoration-none text-dark" style="font-size: 12px;">masuk</a>
                                         </li>
                                     </ul>
                                 </div>
