@@ -87,7 +87,7 @@
                     </form>
 
                     <div class="container text-center mt-3" style="font-weight: 300">
-                        <a href="index.php" class="text-secondary text-decoration-none">Log In</a>
+                        <a href="login.php" class="text-secondary text-decoration-none">Log In</a>
                     </div>
                 </div>
             </div>
@@ -97,6 +97,14 @@
     
     <script>
         $(document).ready(function() {
+			
+			function clearinput(){
+				$('#input-name').val("");
+				$('#input-username').val("");
+				$('#input-email').val("");
+				$('#input-confirm-password').val("");
+				$('#input-password').val("");
+			}
             $('#Register').on('click', function() {
                 var name = $('#input-name').val();
                 var username = $('#input-username').val();
@@ -107,7 +115,7 @@
                 if(username != "" && password != "" && email != "" && confirm != "" && name != "" ){
                     if(password == confirm){
                         $.ajax({
-                            url: "./controllers/logreg.php",
+                            url: "controllers/logreg.php",
                             type: "POST",
                             data: {
                                 type:"REGISTER",
@@ -122,13 +130,14 @@
                                 if(response.statusCode==403){
                                     $('#error').html('Username/email sudah terdaftar!');
                                     $('#header').html('Error');
-                                    $('#myModal').modal('show');				
+                                    $('#myModal').modal('show');	
+									clearinput();
                                 }
                                 else if(response.statusCode==201){
                                     $('#error').html('Berhasil mendaftar!');
                                     $('#header').html('Sukses');
                                     $('#myModal').modal('show');
-                        
+									clearinput();
                                 }else if(response.statusCode==400){
                                     $('#error').html('Gagal mendaftar!');
                                     $('#header').html('Failed');

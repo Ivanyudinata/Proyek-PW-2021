@@ -81,7 +81,7 @@
                 var password = $('#input-password').val();
                 if(username != "" && password != "" ){
                     $.ajax({
-                        url: "./controllers/logreg.php",
+                        url: "controllers/logreg.php",
                         type: "POST",
                         data: {
                             type:"LOGIN",
@@ -89,17 +89,12 @@
                             password: password						
                         },
                         success: function(response){
+                            console.log(response);
                             var response = JSON.parse(response);
                             if(response.statusCode==200){
                                 location.href = "home.php";						
-                            }
-                            else if(response.statusCode==401){
-                                $('#error').html('Password salah!');
-                                $('#header').html('Error');
-                                $('#myModal').modal('show');
-                    
                             }else if(response.statusCode==404){
-                                $('#error').html('Username/Email tidak terdaftar!');
+                                $('#error').html('Password/Email salah!');
                                 $('#header').html('Not Found');
                                 $('#myModal').modal('show');
                             }
