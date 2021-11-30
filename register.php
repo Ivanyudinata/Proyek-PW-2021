@@ -1,5 +1,5 @@
 <?php
-    include("alert.html");
+    require_once("alert.html");
 
 
 ?>

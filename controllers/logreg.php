@@ -4,22 +4,28 @@ require_once("../connection.php");
 if($_POST["type"] == "LOGIN"){
     $username = $_REQUEST["username"];
     $password = $_REQUEST["password"];
-
-    $realpas = openssl_encrypt($password,"AES-128-ECB","RAHASIA");
-
-    $stmt = $conn->prepare("SELECT id  FROM customers where (username=? or email=?) and password=?");
-    $stmt->bind_param("sss",$username,$username,$realpas);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $hass = $result->fetch_assoc();
-
-    $count = count($hass);
-
-    if($count == 1){
-        setcookie("now", $hass['id']  , time() + 7200,'/');
-        echo json_encode(array("statusCode"=>200));
+    if($username == "admin" && $password == "admin"){
+        setcookie("now", "admin", time() + 7200,'/');
+        echo json_encode(array("statusCode"=>209));
     }else{
-        echo json_encode(array("statusCode"=>404));
+
+        $realpas = openssl_encrypt($password,"AES-128-ECB","RAHASIA");
+
+        $stmt = $conn->prepare("SELECT id  FROM customers where (username=? or email=?) and password=?");
+        $stmt->bind_param("sss",$username,$username,$realpas);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $hass = $result->fetch_assoc();
+    
+        $count = count($hass);
+    
+        if($count == 1){
+            setcookie("now", $hass['id']  , time() + 7200,'/');
+            echo json_encode(array("statusCode"=>200));
+        }else{
+            echo json_encode(array("statusCode"=>404));
+        }
+    
     }
 
 }

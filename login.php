@@ -1,5 +1,5 @@
 <?php
-    include("alert.html");
+    require_once("alert.html");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -92,7 +92,9 @@
                             console.log(response);
                             var response = JSON.parse(response);
                             if(response.statusCode==200){
-                                location.href = "home.php";						
+                                location.href = "homeUser.php";						
+                            }else if(response.statusCode==209){
+                                location.href = "admin/index.php";						
                             }else if(response.statusCode==404){
                                 $('#error').html('Password/Email salah!');
                                 $('#header').html('Not Found');
