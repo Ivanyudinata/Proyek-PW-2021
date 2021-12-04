@@ -1,6 +1,6 @@
 <?php 
      require_once '../connection.php';
-     $query = "SELECT id FROM kategori";
+     $query = "SELECT nama_kategori FROM kategori";
      $kategori = mysqli_query($conn,$query)->fetch_all(MYSQLI_ASSOC);
      if(isset($_REQUEST["btntambah"])){
          $namabarang = $_REQUEST["txtnamabarang"];
@@ -81,7 +81,7 @@
                 Kategori Barang : 
                 <select name="cbkategori" id="">
                     <?php foreach($kategori as $kat) : ?>
-                        <option value=""><?= $kat["id"]; ?></option>
+                        <option value=""><?= $kat["nama_kategori"]; ?></option>
                     <?php endforeach; ?>
                 </select><br>
                 Size : <input type="number" name="txtsize" id=""><br>
