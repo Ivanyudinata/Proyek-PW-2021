@@ -1,0 +1,158 @@
+// selectr was built using Bootstrap components, so the css required is
+// rather lean. If your project is not using Bootstrap, include the selectrPolyfill
+// css rather than this one, or write your own styles.
+
+.selectr {
+
+    margin: 0;
+    display: inline-block;
+    max-width: 100%;
+    user-select: none;
+
+    *:not(input) {
+        user-select: none;
+    }
+
+    .panel-heading {
+        cursor: default;
+        &.no-title {
+            padding: 0;
+            border-bottom: none;
+        }
+    }
+
+    .panel-body {
+        position: relative;
+    }
+
+    // prevent IE from doubling up the clear input 'X'
+    input::-ms-clear {
+        display: none;
+        width:0;
+        height:0;
+    }
+
+    .clear-search {
+        position: absolute;
+        right: 25px;
+        top: 12px;
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        opacity: 0.8;
+        cursor: pointer;
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    .list-group {
+        overflow-x: hidden;
+        // -ms-overflow-x: hidden;
+        -ms-overflow-y: auto;
+    }
+
+    .list-group-item {
+        padding: 0 !important;
+        overflow: hidden;
+        cursor: pointer;
+
+        &.selected {
+            background-color: #4679bd;
+            color: white;
+            font-weight: 700;
+            .add-remove {
+                transform: rotate(0deg);
+            }
+        }
+    }
+
+    &.multi {
+        .list-group-item:hover {
+            .option-name {
+                    margin-right: 50px;
+                    border-right: 1px solid #ddd;
+            }
+            .selected {
+                .option-name {
+                    border-right: 1px solid white;
+                }
+            }
+            .add-remove {
+                display: block;
+            }
+        }
+    }
+
+    .option-name {
+        height: 100%;
+        padding: 10px 15px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .color-code {
+        width: 20px;
+        height: 20px;
+        margin: 10px;
+        margin-right: 0;
+        float: left;
+        border-radius: 5px;
+        &.no-color {
+            width: 0;
+            height: 0;
+            margin: 0;
+        }
+    }
+
+    .add-remove {
+        transform: rotate(45deg);
+        transition: transform 0.2s linear;
+        opacity: 0.5;
+        display: none;
+        cursor: pointer;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 900;
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        width: 50px;
+        padding: 8px;
+        line-height: 24px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .ctrl-key .add-remove, .add-remove:hover {
+        opacity: 0.8;
+    }
+
+    .current-selection {
+        float: right;
+        margin-top: 5px;
+        cursor: default;
+    }
+
+    &.max-selection-reached {
+        li:not(.selected) {
+            .option-name {
+                margin-right: 0 !important;
+                border-right: none !important;
+            }
+            .add-remove {
+                display: none !important;
+            }
+        }
+        .current-selection {
+            background-color: #d9534f;
+        }
+    }
+
+    .no-matching-options {
+        padding: 10px;
+        padding-top: 0;
+        text-align: center;
+    }
+}
