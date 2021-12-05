@@ -15,7 +15,7 @@
 
     :root {
         --header-height: 3rem;
-        --nav-width: 68px;
+        --navigation-width: 68px;
         --first-color: #4723D9;
         --first-color-light: #AFA5D9;
         --white-color: #F7F6FB;
@@ -76,11 +76,11 @@
         width: 40px
     }
 
-    .l-navbar {
+    .l-navigationbar {
         position: fixed;
         top: 0;
         left: -30%;
-        width: var(--nav-width);
+        width: var(--navigation-width);
         height: 100vh;
         background-color: var(--first-color);
         padding: .5rem 1rem 0 0;
@@ -88,7 +88,7 @@
         z-index: var(--z-fixed)
     }
 
-    .nav {
+    .navigation {
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -96,8 +96,8 @@
         overflow: hidden
     }
 
-    .nav_logo,
-    .nav_link {
+    .navigation_logo,
+    .navigation_link {
         display: grid;
         grid-template-columns: max-content max-content;
         align-items: center;
@@ -105,32 +105,32 @@
         padding: .5rem 0 .5rem 1.5rem
     }
 
-    .nav_logo {
+    .navigation_logo {
         margin-bottom: 2rem
     }
 
-    .nav_logo-icon {
+    .navigation_logo-icon {
         font-size: 1.25rem;
         color: var(--white-color)
     }
 
-    .nav_logo-name {
+    .navigation_logo-name {
         color: var(--white-color);
         font-weight: 700
     }
 
-    .nav_link {
+    .navigation_link {
         position: relative;
         color: var(--white-color);
         margin-bottom: 1.5rem;
         transition: .3s
     }
 
-    .nav_link:hover {
+    .navigation_link:hover {
         color: var(--white-color)
     }
 
-    .nav_icon {
+    .navigation_icon {
         font-size: 1.25rem
     }
 
@@ -139,7 +139,7 @@
     }
 
     .body-pd {
-        padding-left: calc(var(--nav-width) + 1rem)
+        padding-left: calc(var(--navigation-width) + 1rem)
     }
 
     .aktif {
@@ -160,12 +160,12 @@
     @media screen and (min-width: 768px) {
         body {
             margin: calc(var(--header-height) + 1rem) 0 0 0;
-            padding-left: calc(var(--nav-width) + 2rem)
+            padding-left: calc(var(--navigation-width) + 2rem)
         }
 
         .header {
             height: calc(var(--header-height) + 1rem);
-            padding: 0 2rem 0 calc(var(--nav-width) + 2rem)
+            padding: 0 2rem 0 calc(var(--navigation-width) + 2rem)
         }
 
         .header_img {
@@ -177,41 +177,41 @@
             width: 45px
         }
 
-        .l-navbar {
+        .l-navigationbar {
             left: 0;
             padding: 1rem 1rem 0 0
         }
 
         .perlihatkan {
-            width: calc(var(--nav-width) + 156px)
+            width: calc(var(--navigation-width) + 156px)
         }
 
         .body-pd {
-            padding-left: calc(var(--nav-width) + 188px)
+            padding-left: calc(var(--navigation-width) + 188px)
         }
     }
     </style>
     <script>
     document.addEventListener("DOMContentLoaded", function(event) {
 
-        const perlihatkanNavbar = (toggleId, navId, bodyId, headerId) =>{
+        const perlihatkannavigationbar = (toggleId, navigationId, bodyId, headerId) =>{
         const toggle = document.getElementById(toggleId),
-        nav = document.getElementById(navId),
+        navigation = document.getElementById(navigationId),
         bodypd = document.getElementById(bodyId),
         headerpd = document.getElementById(headerId)
 
-        if(toggle && nav && bodypd && headerpd){
+        if(toggle && navigation && bodypd && headerpd){
             toggle.addEventListener('click', ()=>{
-                nav.classList.toggle('perlihatkan')
+                navigation.classList.toggle('perlihatkan')
                 toggle.classList.toggle('fa-bars')
                 toggle.classList.toggle('fa-sign-out-alt')
             })
         }
         }
 
-    perlihatkanNavbar('header-toggle','nav-bar','body-pd','header')
+    perlihatkannavigationbar('header-toggle','navigation-bar','body-pd','header')
 
-    const linkColor = document.querySelectorAll('.nav_link')
+    const linkColor = document.querySelectorAll('.navigation_link')
 
     function colorLink(){
         if(linkColor){
@@ -225,34 +225,34 @@
     </script>
 </head>
 <body id="body-pd">
-    <div class="l-navbar" id="nav-bar">
-        <nav class="nav">
+    <div class="l-navigationbar" id="navigation-bar">
+        <navigation class="navigation">
             <div> 
-                <div class="nav_list"> 
-                    <a href="#" id="header" class="nav_link aktif header_toggle"> 
+                <div class="navigation_list"> 
+                    <a href="#" id="header" class="navigation_link aktif header_toggle"> 
                         <i class='fas fa-bars' id="header-toggle"></i> 
                     </a>
-                    <a href="index.php" class="nav_link aktif"> 
-                        <i class='fas fa-cubes nav_icon'></i> 
-                        <span class="nav_name">Home</span> 
+                    <a href="index.php" class="navigation_link aktif"> 
+                        <i class='fas fa-cubes navigation_icon'></i> 
+                        <span class="navigation_name">Home</span> 
                     </a>
-                    <a href="category.php" class="nav_link"> 
-                        <i class='fas fa-list nav_icon'></i> 
-                        <span class="nav_name">Kategori</span> 
+                    <a href="category.php" class="navigation_link"> 
+                        <i class='fas fa-list navigation_icon'></i> 
+                        <span class="navigation_name">Kategori</span> 
                     </a> 
-                    <a href="order.php" class="nav_link"> 
-                        <i class='fas fa-shopping-bag nav_icon'></i> 
-                        <span class="nav_name">Order</span> 
+                    <a href="order.php" class="navigation_link"> 
+                        <i class='fas fa-shopping-bag navigation_icon'></i> 
+                        <span class="navigation_name">Order</span> 
                     </a> 
-                    <a href="report.php" class="nav_link"> 
-                        <i class='fas fa-file-alt nav_icon'></i> 
-                        <span class="nav_name">Report</span> 
+                    <a href="report.php" class="navigation_link"> 
+                        <i class='fas fa-file-alt navigation_icon'></i> 
+                        <span class="navigation_name">Report</span> 
                     </a> 
                 </div>
-            </div> <a href="#" class="nav_link"> 
-                <i class='fas fa-sign-out-alt nav_icon'></i> 
-                <span class="nav_name">SignOut</span> </a>
-        </nav>
+            </div> <a href="#" class="navigation_link"> 
+                <i class='fas fa-sign-out-alt navigation_icon'></i> 
+                <span class="navigation_name">SignOut</span> </a>
+        </navigation>
     </div>
 </body>
 </html>

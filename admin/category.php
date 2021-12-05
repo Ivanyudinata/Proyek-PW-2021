@@ -42,7 +42,6 @@
 
     <script>
       $(document).ready(function() {
-        $('select').selectpicker();
         
         $("#btn-close-sidebar").click(function(){
           $(".text-desc").toggle();
