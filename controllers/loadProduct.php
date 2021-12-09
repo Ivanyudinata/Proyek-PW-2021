@@ -11,7 +11,7 @@ if($status == "SEMUA"){
 }
 
 
-$query = "SELECT * FROM products order by id asc " . $quer;
+$query = "SELECT * FROM products ". $quer." order by id asc " ;
 $stmt = $conn->query($query);
 $allprod = $stmt->fetch_all(MYSQLI_ASSOC);
 $res = "";
@@ -87,7 +87,7 @@ if(count($allprod) > 0){
               </td>
               <td>
                 <div class="form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" '.$isMainActive.'>
+                  <input class="form-check-input" type="checkbox" role="switch" id="switch-'. $value["id"].'" onchange="onClickChxBox(this)" '.$isMainActive.'>
                 </div>
               </td>
               <td>

@@ -43,7 +43,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;300;400&family=Work+Sans:wght@300;400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="../css/style.css"/>
     <script src="../js/popper.min.js"></script>
     <script src="../js/chosen.jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" >
@@ -70,17 +69,42 @@
             }
 
           }
-        </script>
+    </script>
         <script>
+          var now = "SEMUA";
+
           function load(){
-            $('#tableSemuaProduk').load("../controllers/loadProduct.php",{
-              status: "SEMUA"
+            var table = (now == "SEMUA" ? "tableSemuaProduk" : (now == "ACTIVE" ? "tableProdukAktif" : "tableProdukNonAktif") ); 
+            $('#'+table).load("../controllers/loadProduct.php",{
+              status: now
             }, function (response, status, request) {
 
                 }    
             );
           }
 
+          function onClickChxBox(e){
+            var arr = e.id.split("-");
+            $.ajax({
+                  url: "../controllers/product.php",
+                  type: "POST",
+                  data: {
+                    type: "SWITCH",
+                    idproduk: arr[1]
+                  },
+                  success: function(response){
+                      var response = JSON.parse(response);
+                      if(response.statusCode==200){
+                          load();			
+                      }else if(response.statusCode==209){
+                          $('#error').html('Error status tidak bisa diubah!');
+                          $('#header').html('Error');
+                          $('#myModal').modal('show');						
+                      }
+                      
+                  }
+                });
+          }
 
           function callback(e, thisObj) {	
             var arr = e.currentTarget.id.split("-");
@@ -123,6 +147,20 @@
             var warna = [];
             
             load();
+            
+            $('#allproduct-tab').on('click',function(e) {
+              now = "SEMUA";
+              load();
+            });
+            $('#aktifproduct-tab').on('click',function(e) {
+              now = "ACTIVE";
+              load();
+            });
+            $('#nonaktifproduct-tab').on('click',function(e) {
+              now = "NONACTIVE";
+              load();
+            });
+
             $('#addBarang').submit(function(e) {
                 e.preventDefault();
                 
@@ -364,6 +402,7 @@
             <th scope="col">Harga</th>
             <th scope="col">Stok</th>
             <th scope="col">Aktif</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>  
         <tbody id="tableProdukAktif">
@@ -379,6 +418,7 @@
             <th scope="col">Harga</th>
             <th scope="col">Stok</th>
             <th scope="col">Aktif</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>  
         <tbody id="tableProdukNonAktif">
@@ -390,133 +430,133 @@
 
     
   </div>
-  <!-- Modal Add Menu -->
+  <!-- Modal Add Produk -->
   
   <div class="modal fade" id="addTablesModal"  aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
-            <button type="button" class="btn close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form action="" method="POST" id="addBarang" enctype="multipart/form-data">
-              <div class="form-group py-2">
-                <label for="product-name" class="col-form-label">Nama : </label>
-                <input type="text" class="form-control" id="product-name" name="product-name" required>
-              </div>
-
-              <div class="form-group row py-2">
-                <div class="col">
-                  <label for="product-kategori" class="col-form-label">Kategori : </label>
-                  <select class="form-control selectpicker" id="product-kategori" name="product-kategori" data-live-search="true" required>
-                  <?php 
-                  foreach($kategori as $key => $value) {
-                      ?> 
-                      <option value='<?= $value["id"] ?>'> <?= $value["nama_kategori"] ?> </option> 
-                      <?php
-                    }
-                      ?>
-                    </select>
-                </div>
-              </div>
-
-              <div class="form-group py-2">
-                <label for="product-deskripsi" class="col-form-label">Deskripsi:</label>
-                <textarea class="form-control" id="product-deskripsi" name="product-deskripsi"></textarea>
-              </div>
-
-              <div class="form-group py-2">
-                <label for="product-harga"> Minimum Pemesanan : </label>
-                <div class="input-group mb-3">
-                  <input class="form-control validate" type="number" name="product-min-order" id="product-min-order" placeholder="Masukkan Minimum Pemesanan" required>
-                </div>
-              </div>
-
-              
-              <div class="d-flex py-2">
-                <label for="variasi-warna"> Warna (Optional) </label>
-                <select class="selectpicker" id="variasi-warna" name="product-variasi-warna" multiple data-live-search="true">
-                  <option> red </option>
-                  <option> yellow</option>
-                  <option> blue</option>
-                  <option> brown</option>
-                  <option> orange</option>
-                  <option> green</option>
-                  <option> violet</option>
-                  <option> black</option>
-                  <option> carnation pink</option>
-                  <option> yellow orange</option>
-                  <option> blue green</option>
-                  <option> red violet</option>
-                  <option> red orange</option>
-                  <option> yellow green</option>
-                  <option> blue violet</option>
-                  <option> white</option>
-                  <option> violet red</option>
-                  <option> dandelion</option>
-                  <option> cerulean</option>
-                  <option> apricot</option>
-                  <option> scarlet</option>
-                  <option> green yellow</option>
-                  <option> indigo and gray</option>
-                </select>
-              </div>
-              <hr>
-              
-
-              <div id="input-variasi-warna" class="d-flex flex-wrap py-2"></div>
-
-              <div class="form-group py-2" id="input-harga">
-                <label for="product-harga"> Foto Produk </label>
-                <div id='gambarmain' class='card p-0 m-3 border-0' style='width: 6rem'>
-                  <div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >
-                    <img id='warna-img-main' src='../assets/plus.svg' class='w-100 h-100'>
-                    <input type='file' accept='image/*' name='Gambar[]' id='warna-input-main' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>
-                  </div>
-                  <div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>
-                    <span>Main Picture</span>
-                  </div> 
-                </div>
-                <label for="product-harga"> Harga : </label>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Rp.</span>
-                  </div>
-                  <input class="currencyInput form-control validate" type="text" name="product-harga" id="product-harga" placeholder="Masukkan Harga" required>
-                </div>
-                
-                <label for="product-harga"> Stok : </label>
-                <div class="input-group mb-3">
-                  <input class="form-control validate" type="number" name="product-stok" id="product-stok" placeholder="Masukkan Stok" required>
-                </div>
-              </div>
-              
-              
-              <div id="input-variasi-ukuran"></div>
-
-              <div class="form-group py-2" id="input-berat">
-                <label for="product-berat"> Berat : </label>
-                <div class="input-group mb-3">
-                  <input class="currencyInput form-control validate" type="text" name="product-berat" id="product-berat" placeholder="Masukkan Berat" required>
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Gram(g)</span>
-                  </div>
-                </div>
-              </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="product-add">Add</button>
-          </div>
-          </form>
-
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Product</h5>
+          <button type="button" class="btn close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <form action="" method="POST" id="addBarang" enctype="multipart/form-data">
+            <div class="form-group py-2">
+              <label for="product-name" class="col-form-label">Nama : </label>
+              <input type="text" class="form-control" id="product-name" name="product-name" required>
+            </div>
+
+            <div class="form-group row py-2">
+              <div class="col">
+                <label for="product-kategori" class="col-form-label">Kategori : </label>
+                <select class="form-control selectpicker" id="product-kategori" name="product-kategori" data-live-search="true" required>
+                <?php 
+                foreach($kategori as $key => $value) {
+                    ?> 
+                    <option value='<?= $value["id"] ?>'> <?= $value["nama_kategori"] ?> </option> 
+                    <?php
+                  }
+                    ?>
+                  </select>
+              </div>
+            </div>
+
+            <div class="form-group py-2">
+              <label for="product-deskripsi" class="col-form-label">Deskripsi:</label>
+              <textarea class="form-control" id="product-deskripsi" name="product-deskripsi"></textarea>
+            </div>
+
+            <div class="form-group py-2">
+              <label for="product-harga"> Minimum Pemesanan : </label>
+              <div class="input-group mb-3">
+                <input class="form-control validate" type="number" name="product-min-order" id="product-min-order" placeholder="Masukkan Minimum Pemesanan" required>
+              </div>
+            </div>
+
+            
+            <div class="d-flex py-2">
+              <label for="variasi-warna"> Warna (Optional) </label>
+              <select class="selectpicker" id="variasi-warna" name="product-variasi-warna" multiple data-live-search="true">
+                <option> red </option>
+                <option> yellow</option>
+                <option> blue</option>
+                <option> brown</option>
+                <option> orange</option>
+                <option> green</option>
+                <option> violet</option>
+                <option> black</option>
+                <option> carnation pink</option>
+                <option> yellow orange</option>
+                <option> blue green</option>
+                <option> red violet</option>
+                <option> red orange</option>
+                <option> yellow green</option>
+                <option> blue violet</option>
+                <option> white</option>
+                <option> violet red</option>
+                <option> dandelion</option>
+                <option> cerulean</option>
+                <option> apricot</option>
+                <option> scarlet</option>
+                <option> green yellow</option>
+                <option> indigo and gray</option>
+              </select>
+            </div>
+            <hr>
+            
+
+            <div id="input-variasi-warna" class="d-flex flex-wrap py-2"></div>
+
+            <div class="form-group py-2" id="input-harga">
+              <label for="product-harga"> Foto Produk </label>
+              <div id='gambarmain' class='card p-0 m-3 border-0' style='width: 6rem'>
+                <div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >
+                  <img id='warna-img-main' src='../assets/plus.svg' class='w-100 h-100'>
+                  <input type='file' accept='image/*' name='Gambar[]' id='warna-input-main' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>
+                </div>
+                <div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>
+                  <span>Main Picture</span>
+                </div> 
+              </div>
+              <label for="product-harga"> Harga : </label>
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Rp.</span>
+                </div>
+                <input class="currencyInput form-control validate" type="text" name="product-harga" id="product-harga" placeholder="Masukkan Harga" required>
+              </div>
+              
+              <label for="product-harga"> Stok : </label>
+              <div class="input-group mb-3">
+                <input class="form-control validate" type="number" name="product-stok" id="product-stok" placeholder="Masukkan Stok" required>
+              </div>
+            </div>
+            
+            
+            <div id="input-variasi-ukuran"></div>
+
+            <div class="form-group py-2" id="input-berat">
+              <label for="product-berat"> Berat : </label>
+              <div class="input-group mb-3">
+                <input class="currencyInput form-control validate" type="text" name="product-berat" id="product-berat" placeholder="Masukkan Berat" required>
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Gram(g)</span>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="product-add">Add</button>
+        </div>
+        </form>
+
       </div>
     </div>
+  </div>
         
             
 </body>

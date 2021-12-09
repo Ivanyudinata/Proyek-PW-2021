@@ -121,5 +121,14 @@ if($_POST["type"] == "ADD"){
     }
 
     
+}else if($_POST["type"] == "SWITCH"){
+    $product_id = $_POST["idproduk"];
+    $result = $conn->query("UPDATE products SET status = IF(status=1, 0, 1)");
+
+    if($result){
+        echo json_encode(array("statusCode"=>200));
+    }else{
+        echo json_encode(array("statusCode"=>209));
+    }
 }
 ?>

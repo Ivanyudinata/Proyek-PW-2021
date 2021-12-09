@@ -122,7 +122,7 @@
         }    
     );
   }
-
+  
   function callback(e, thisObj) {	
     var arr = e.currentTarget.id.split("-");
     if(arr[0] == "edit"){
@@ -131,6 +131,7 @@
       $('#category-name').val(e.currentTarget.dataset.tag);	
       $('#addKategori').attr('IDKategori', arr[1]);
       $('#addTablesModal').modal('show');
+
     }else if(arr[0] == "delete"){
       $('#btn-Ok').attr('IDKategori', arr[1]);
       $('#ConfirmationModal').modal('show');	
@@ -147,6 +148,33 @@
           $('.modal-backdrop').remove();
           var nama = $('#category-name').val();
           if(nama != ""  ){
+            if($('#addKategori').html() == "Edit"){
+              var id = $('#addKategori').attr('IDKategori');
+              $.ajax({
+                  url: "../controllers/category.php",
+                  type: "POST",
+                  data: {
+                      type:"EDIT",
+                      nama: nama,
+                      idkategori: id					
+                  },
+                  success: function(response){
+                      console.log(response);
+                      var response = JSON.parse(response);
+                      if(response.statusCode==200){
+                          $('#error').html('Berhasil diedit!');
+                          $('#header').html('Success');
+                          $('#myModal').modal('show');	
+                          load();			
+                      }else if(response.statusCode==209){
+                          $('#error').html('Gagal diedit!');
+                          $('#header').html('Error');
+                          $('#myModal').modal('show');						
+                      }
+                      
+                  }
+              });
+            }else{
               $.ajax({
                   url: "../controllers/category.php",
                   type: "POST",
@@ -170,6 +198,8 @@
                       
                   }
               });
+
+            }
           }
           else{
               $('#error').html('Semua kolom harus diisi!');
