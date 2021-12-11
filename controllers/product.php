@@ -33,7 +33,6 @@ function uploadImage($fileGambar,$namafile,$idx) {
         }
     }
 }
-
 if($_POST["type"] == "ADD"){    
 
     $nama = $_POST["product-name"];
@@ -80,16 +79,16 @@ if($_POST["type"] == "ADD"){
         if ($conn->query($sql) === TRUE) {
             $last_id = $conn->insert_id;
                 
-            foreach($arrGambar as $key => $value){
+            foreach($arrHarga as $key => $value){
                 $new_str = str_replace(' ', '', $arrwarna[$key]);
-                $namafile = uploadImage($value,$idnow."-".$new_str);
+                $namafile = uploadImage($arrGambar,$idnow."-".$new_str,$key);
                 if($namafile != ""){
                     $statnow = ($arrStatus[$key] == "on") ? 1 : 0;
                     $stoknow = $arrStok[$key];
                     $harganow = preg_replace('/[^0-9]/', '', $arrHarga[$key]);
                     $warnanow = $arrwarna[$key];
                     $query= "INSERT INTO `variasiwarna`(`product_id`, `warna`, `harga`, `stok`, `img_path`, `status`) VALUES ('$last_id','$warnanow','$harganow','$stoknow','$namafile','$statnow')";
-                                
+                    echo ($query);     
                     if ($conn->query($query) != TRUE) {
                         break;
                         $sukses = false;
@@ -123,12 +122,32 @@ if($_POST["type"] == "ADD"){
     
 }else if($_POST["type"] == "SWITCH"){
     $product_id = $_POST["idproduk"];
-    $result = $conn->query("UPDATE products SET status = IF(status=1, 0, 1)");
+    $result = $conn->query("UPDATE products SET status = IF(status=1, 0, 1) where id=$product_id");
 
     if($result){
         echo json_encode(array("statusCode"=>200));
     }else{
         echo json_encode(array("statusCode"=>209));
     }
+}else if($_POST["type"] == "SWITCHVAR"){
+    $varian_id = $_POST["idvarian"];
+    $result = $conn->query("UPDATE variasiwarna SET status = IF(status=1, 0, 1) where id=$varian_id");
+
+    if($result){
+        echo json_encode(array("statusCode"=>200));
+    }else{
+        echo json_encode(array("statusCode"=>209));
+    }
+
+}else if($_POST["type"] == "DELVARIASI"){
+    $variasi_id = $_POST["idvariasi"];
+    $result = $conn->query("DELETE FROM variasiwarna WHERE id=$variasi_id");
+
+    if($result){
+        echo json_encode(array("statusCode"=>200));
+    }else{
+        echo json_encode(array("statusCode"=>209));
+    }
+
 }
 ?>

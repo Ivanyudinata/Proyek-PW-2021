@@ -70,21 +70,43 @@
 
           }
     </script>
-        <script>
-          var now = "SEMUA";
+      <script>
+        var now = "SEMUA";
 
-          function load(){
-            var table = (now == "SEMUA" ? "tableSemuaProduk" : (now == "ACTIVE" ? "tableProdukAktif" : "tableProdukNonAktif") ); 
-            $('#'+table).load("../controllers/loadProduct.php",{
-              status: now
-            }, function (response, status, request) {
+        function load(){
+          var table = (now == "SEMUA" ? "tableSemuaProduk" : (now == "ACTIVE" ? "tableProdukAktif" : "tableProdukNonAktif") ); 
+          $('#'+table).load("../controllers/loadProduct.php",{
+            status: now
+          }, function (response, status, request) {
 
-                }    
-            );
-          }
+              }    
+          );
+        }
+        
+        function onClickChxBox(e){
+          var arr = e.id.split("-");
+          if(arr[0] == "switchvar"){
 
-          function onClickChxBox(e){
-            var arr = e.id.split("-");
+            $.ajax({
+                url: "../controllers/product.php",
+                type: "POST",
+                data: {
+                  type: "SWITCHVAR",
+                  idvarian: arr[1]
+                },
+                success: function(response){
+                    var response = JSON.parse(response);
+                    if(response.statusCode==200){
+                        load();			
+                    }else if(response.statusCode==209){
+                        $('#error').html('Error status tidak bisa diubah!');
+                        $('#header').html('Error');
+                        $('#myModal').modal('show');						
+                    }
+                    
+                }
+              });
+          }else{
             $.ajax({
                   url: "../controllers/product.php",
                   type: "POST",
@@ -104,115 +126,196 @@
                       
                   }
                 });
-          }
 
-          function callback(e, thisObj) {	
-            var arr = e.currentTarget.id.split("-");
-            if(arr[0] == "edit"){
-              $('#exampleModalLabel').html('Edit Product');	
-              $('#addKategori').html('Edit');	
-              $('#category-name').val(e.currentTarget.dataset.tag);	
-              $('#addKategori').attr('IDKategori', arr[1]);
-              $('#addTablesModal').modal('show');
-            }else if(arr[0] == "delete"){
-              $('#btn-Ok').attr('IDProduk', arr[1]);
-              $('#ConfirmationModal').modal('show');	
-            }
-        
           }
+        }
 
-          function elemukuran(nama,id ){
-            return "<tr>"+
-              "<th scope='row'>"+nama+"</th>"+
-              "<td>"+
-              "<div class='input-group mb-3'>"+
-                  "<div class='input-group-prepend'>"+
-                    "<span class='input-group-text'>Rp.</span>"+
-                  "</div>"+
-                "<input type='text' name='hargaVarian[]' class='form-control harga' placeholder='Harga' aria-label='Harga' required>"+
-                "</div>"+
-                "</td>"+
-              "<td>"+
-                "<input type='number' name='stokVarian[]' class='form-control' placeholder='Stok' aria-label='Stok' required>"+
-                "</td>"+
-              "<td>"+
-                "<div class='form-check form-switch'>"+
-                  "<input class='form-check-input' name='statusVarian[]' type='checkbox' role='switch' id='flexSwitchCheckDefault' checked>"+
-                "</div>"+
-              "</td>"+
-            "</tr>";
-          }
-
-          $(document).ready(function() {
-            var warna = [];
+        var lastColor = [];
+        function callback(e, thisObj) {	
+          var arr = e.currentTarget.id.split("-");
+          if(arr[0] == "edit"){
+            $('#exampleModalLabel').html('Edit Product');	
+            $('#addKategori').html('Edit');	
             
-            load();
-            
-            $('#allproduct-tab').on('click',function(e) {
-              now = "SEMUA";
-              load();
-            });
-            $('#aktifproduct-tab').on('click',function(e) {
-              now = "ACTIVE";
-              load();
-            });
-            $('#nonaktifproduct-tab').on('click',function(e) {
-              now = "NONACTIVE";
-              load();
-            });
-
-            $('#addBarang').submit(function(e) {
-                e.preventDefault();
-                
-                $('#addTablesModal').modal('hide');	
-                $('body').removeClass('modal-open');
-                $('.modal-backdrop').remove();
-                                 
-                var nama =  $('#product-name').val();
-                var kategori = $('#product-kategori').val();
-                var deskripsi = $('#product-deskripsi').val();
-                var minorder = $('#product-min-order').val();
-                var harga = $('#product-harga').val();
-                var berat = $('#product-berat').val();
-                var varwarna = $('#variasi-warna').val();
-                var kam = "";
-
-                var form = $('form')[0]; // You need to use standard javascript object here
-                var formData = new FormData(form);
-                
-                formData.append('type', 'ADD');
-                $.ajax({
-                  url: "../controllers/product.php",
+            $.ajax({
+                  url: "../controllers/loadProductById.php",
                   type: "POST",
-                  data: formData,
-                  contentType: false,
-                  processData: false,
+                  data: {
+                    id:arr[1]						
+                  },
                   success: function(response){
                       console.log(response);
                       var response = JSON.parse(response);
-                      if(response.statusCode==200){
-                          $('#error').html('Berhasil Add!');
-                          $('#header').html('Success');
-                          $('#myModal').modal('show');	
-                          load();			
-                      }else if(response.statusCode==209){
-                          $('#error').html('Nama sudah ada!');
-                          $('#header').html('Error');
-                          $('#myModal').modal('show');						
+                      if(response[1].length > 0){
+                        
+                        $('#product-name').val(response[0]["name"]);
+                        $('#product-deskripsi').val(response[0]["description"]);
+                        $('#product-min-order').val(response[0]["minimumorder"]);
+                        $('#product-berat').val(response[0]["berat"]);
+                        
+                        $("#product-kategori option[value='"+response[0]["nama_kategori"]+"']").prop("selected", true);
+                        
+                        $('#product-kategori').val(response[0]["nama_kategori"]);
+                        var arrsd = [];
+                        response[1].forEach(function(item) {
+                          
+                          var stat = (item["status"] == 1) ? "checked" : "";
+                          var newelem = elemukuranedit(item["warna"],item["harga"],item["stok"],stat);
+                          $("#input-attr-warna").append(newelem);
+                          var newitem = item["warna"].replace(/\s/g, '');
+                          $("#variasi-warna option[value='"+newitem+"']").prop("selected", true);
+                          arrsd.push(newitem);
+                          lastColor.push(newitem);
+                          res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
+                                    "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
+                                      "<img id='warna-img-"+newitem+"' src='../Uploads/"+item["img_path"]+"' class='w-100 h-100'>"+
+                                      "<input type='file' accept='image/*' src='../Uploads/"+item["img_path"]+"' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
+                                    "</div>"+
+                                    "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
+                                      "<span>"+newitem+"</span>" + 
+                                    "</div>" + 
+                                "</div>";
+                          $("#input-variasi-warna").append(res);
+                          $('#warna-input-'+newitem+'').change(function(evt) {
+                            const[file] = $('#warna-input-'+newitem+'').prop('files');
+                            if (file) {
+                              $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
+                            }
+                          });
+
+                          $("#input-harga").hide();
+                        });
+                        $("#variasi-warna").val(arrsd);
+                      }else{
+
                       }
+
+                      $('#addTablesModal').modal('show');
+                      $('#product-add').attr('IDKategori', arr[1]);
                       
                   }
-                });
+              });
+          }else if(arr[0] == "delete"){
+            $('#btn-Ok').attr('IDProduk', arr[1]);
+            $('#ConfirmationModal').modal('show');	
+          }else if(arr[0] == "deletevar"){
+            $('#btn-Ok').attr('IDVariasi', arr[1]);
+            $('#ConfirmationModal').modal('show');	
 
-                
-            });
-    
-            $('#btn-Ok').on('click', function(e) {
-              $('#ConfirmationModal').modal('hide');	
+          }else if(arr[0] == "editvar"){
+            
+            $('#editTablesModal').modal('show');
+          }
+      
+        }
+
+        function elemukuranedit(id,harga,stok,status ){
+          return "<tr id='tab-"+id+"'>"+
+            "<th scope='row'>"+id+"</th>"+
+            "<td>"+
+            "<div class='input-group mb-3'>"+
+                "<div class='input-group-prepend'>"+
+                  "<span class='input-group-text'>Rp.</span>"+
+                "</div>"+
+              "<input type='text' value='"+harga+"' name='hargaVarian[]' class='form-control harga' placeholder='Harga' aria-label='Harga' required>"+
+              "</div>"+
+              "</td>"+
+            "<td>"+
+              "<input type='number' value='"+stok+"' name='stokVarian[]' class='form-control' placeholder='Stok' aria-label='Stok' required>"+
+              "</td>"+
+            "<td>"+
+              "<div class='form-check form-switch'>"+
+                "<input class='form-check-input' name='statusVarian[]' type='checkbox' role='switch' "+status+">"+
+              "</div>"+
+            "</td>"+
+          "</tr>";
+        }
+        function elemukuran(nama,id ){
+          return "<tr id='tab-"+id+"'>"+
+            "<th scope='row'>"+nama+"</th>"+
+            "<td>"+
+            "<div class='input-group mb-3'>"+
+                "<div class='input-group-prepend'>"+
+                  "<span class='input-group-text'>Rp.</span>"+
+                "</div>"+
+              "<input type='text' name='hargaVarian[]' class='form-control harga' placeholder='Harga' aria-label='Harga' required>"+
+              "</div>"+
+              "</td>"+
+            "<td>"+
+              "<input type='number' name='stokVarian[]' class='form-control' placeholder='Stok' aria-label='Stok' required>"+
+              "</td>"+
+            "<td>"+
+              "<div class='form-check form-switch'>"+
+                "<input class='form-check-input' name='statusVarian[]' type='checkbox' role='switch' checked>"+
+              "</div>"+
+            "</td>"+
+          "</tr>";
+        }
+
+        $(document).ready(function() {
+          var warna = [];
+          
+          load();
+          
+          $('#allproduct-tab').on('click',function(e) {
+            now = "SEMUA";
+            load();
+          });
+          $('#aktifproduct-tab').on('click',function(e) {
+            now = "ACTIVE";
+            load();
+          });
+          $('#nonaktifproduct-tab').on('click',function(e) {
+            now = "NONACTIVE";
+            load();
+          });
+
+          $('#addBarang').submit(function(e) {
+              e.preventDefault();
+              
+              $('#addTablesModal').modal('hide');	
               $('body').removeClass('modal-open');
               $('.modal-backdrop').remove();
+                                
+              var kam = "";
 
-              var id = $(this).attr('IDProduk');
+              var form = $('form')[0]; 
+              var formData = new FormData(form);
+              
+              formData.append('type', 'ADD');
+              $.ajax({
+                url: "../controllers/product.php",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response){
+                    console.log(response);
+                    var response = JSON.parse(response);
+                    if(response.statusCode==200){
+                        $('#error').html('Berhasil Add!');
+                        $('#header').html('Success');
+                        $('#myModal').modal('show');	
+                        load();			
+                    }else if(response.statusCode==209){
+                        $('#error').html('Nama sudah ada!');
+                        $('#header').html('Error');
+                        $('#myModal').modal('show');						
+                    }
+                    
+                }
+              });
+
+              
+          });
+  
+          $('#btn-Ok').on('click', function(e) {
+            $('#ConfirmationModal').modal('hide');	
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+            
+            var id = $(this).attr('IDProduk');
+            if(id != null){
               $.ajax({
                   url: "../controllers/product.php",
                   type: "POST",
@@ -236,100 +339,142 @@
                       
                   }
               });
-            });
-            
-            $('#warna-input-main').change(function(evt) {
-              const[file] = $('#warna-input-main').prop('files');
-              if (file) {
-                $('#warna-img-main').attr("src",URL.createObjectURL(file));
-              }
-            });
 
-            $('#addTablesModal').on('hidden.bs.modal', function(e) {
-              $(this).find('form')[0].reset();
-              $('#variasi-warna').val('');
-              $("#input-harga").show();
-              $("#input-variasi-warna").html('');
-              $("#input-variasi-ukuran").html('');
-
-              $("#product-kategori").val('default');
-              $("#variasi-warna").val('default');
-              $(".filter-option-inner-inner").html('');
-              $("#product-harga").prop('disabled', false);
-              
-              $("#product-stok").prop('disabled', false);
-            });
-
-            $('#addTablesModal').on('show.bs.modal', function(e) {
-              $("#warna-input-main").prop('disabled', false);
-              $('#warna-img-main').attr('src', '../assets/plus.svg');
-            });
-              $('select').change(function(e) {
-                  var selected = $(e.target).val() + "";
-                  var check = selected.split(",");
-                  if(e.target.id == "variasi-warna"){
-                    var res = "";var war = "";
-                    $("#input-variasi-warna").html("");
-                    $("#input-variasi-ukuran").html("");
-                    warna = check;
-                    if(selected != ""){
-                      $("#input-harga").hide();
-                      $("#warna-input-main").val('');
-                      $('#warna-img-main').attr('src', '../assets/plus.svg');
-                      $("#warna-input-main").prop('disabled', true);
-                      $("#product-harga").prop('disabled', true);
-                      $("#product-stok").prop('disabled', true);
-                      
-                      check.forEach(function(item) {
-                        var newitem = item.replace(/\s/g, '');
-                        res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
-                                      "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
-                                        "<img id='warna-img-"+newitem+"' src='../assets/plus.svg' class='w-100 h-100'>"+
-                                        "<input type='file' accept='image/*' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
-                                      "</div>"+
-                                      "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
-                                        "<span>"+item+"</span>" + 
-                                      "</div>" + 
-                                  "</div>";
-                        $("#input-variasi-warna").append(res);
-                        $('#warna-input-'+newitem+'').change(function(evt) {
-                          const[file] = $('#warna-input-'+newitem+'').prop('files');
-                          if (file) {
-                            $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
-                          }
-                        });
-                        war += elemukuran(item,newitem);
-                      });
-                      res = "<table class='table caption-top'>"+
-                                    "<thead>"+
-                                      "<tr>"+
-                                        "<th scope='col'>Nama</th>"+
-                                        "<th scope='col'>Harga</th>"+
-                                        "<th scope='col'>Stok</th>"+
-                                        "<th scope='col'>Status</th>"+
-                                      "</tr>"+
-                                    "</thead>"+
-                                    "<tbody>"+
-                                      war + 
-                                    "</tbody>"+
-                                  "</table>";
-                                  
-                        $("#input-variasi-ukuran").append(res);
-                        var newnum = new AutoNumeric.multiple('.harga', AutoNumeric.getPredefinedOptions().numericPos.dotDecimalCharCommaSeparator);
-                      }else{
-                        $("#input-harga").show();
-                        $("#warna-input-main").prop('disabled', false);
-                        $("#product-harga").prop('disabled', false);
-                        $("#product-stok").prop('disabled', false);
-                      
+            }else{
+              var id = $(this).attr('IDVariasi');
+              $.ajax({
+                  url: "../controllers/product.php",
+                  type: "POST",
+                  data: {
+                      type:"DELVARIASI",
+                      idvariasi: id						
+                  },
+                  success: function(response){
+                      console.log(response);
+                      var response = JSON.parse(response);
+                      if(response.statusCode==200){
+                          $('#error').html('Berhasil Dihapus!');
+                          $('#header').html('Success');
+                          $('#myModal').modal('show');	
+                          load();			
+                      }else if(response.statusCode==209){
+                          $('#error').html('Gagal Dihapus!');
+                          $('#header').html('Error');
+                          $('#myModal').modal('show');						
                       }
-                    }
-                  }); 
-              var autoNumericInstance = new AutoNumeric('#product-harga', AutoNumeric.getPredefinedOptions().numericPos.dotDecimalCharCommaSeparator);
-              
+                      
+                  }
+              });
+
+            }
           });
 
-        </script>
+          $('#warna-input-main').change(function(evt) {
+            const[file] = $('#warna-input-main').prop('files');
+            if (file) {
+              $('#warna-img-main').attr("src",URL.createObjectURL(file));
+            }
+          });
+          $('#addTablesModal').on('hidden.bs.modal', function(e) {
+            $(this).find('form')[0].reset();
+            $('#variasi-warna').val('');
+            $("#input-harga").show();
+            $("#input-variasi-warna").html('');
+            $("#input-attr-warna").html('');
+
+            $("#product-kategori").val('default');
+            $("#variasi-warna").val('default');
+            $(".filter-option-inner-inner").html('');
+            $("#product-harga").prop('disabled', false);
+            lastColor = [];
+            $("#product-stok").prop('disabled', false);
+          });
+
+          $('#addTablesModal').on('show.bs.modal', function(e) {
+            $("#warna-input-main").prop('disabled', false);
+            $('#warna-img-main').attr('src', '../assets/plus.svg');
+          });
+          var newnum;
+            $('select').change(function(e) {
+              var selected = $(e.target).val() + "";
+              var check = selected.split(",");
+              if(e.target.id == "variasi-warna"){
+                var res = "";var war = "";
+                warna = check;
+                if(selected != ""){
+                  $("#input-harga").hide();
+                  $("#warna-input-main").val('');
+                  $('#warna-img-main').attr('src', '../assets/plus.svg');
+                  $("#warna-input-main").prop('disabled', true);
+                  $("#product-harga").prop('disabled', true);
+                  $("#product-stok").prop('disabled', true);
+
+                  if(lastColor != null){
+                    console.log(lastColor + " Check: " + check);
+                  }
+                  if(lastColor.length > 0){
+                    lastColor.forEach(function(item) {
+                        if(check.indexOf(item) == -1){
+                          if(check.length < lastColor.length ){
+                            var newitem = item.replace(/\s/g, '');
+                            $('#warna-'+newitem+'').remove();
+                            $('#tab-'+newitem+'').remove();
+                          }
+                        }
+                      
+                      
+                    });
+                  }
+                  check.forEach(function(item) {
+                    var ada = false;
+                    if(lastColor != null){
+                      lastColor.forEach(function(itemColor) {
+                        if(item == itemColor){
+                          ada = true;
+                        }
+                      });
+                    }
+                    if(!ada){
+                      var newitem = item.replace(/\s/g, '');
+                      res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
+                                    "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
+                                      "<img id='warna-img-"+newitem+"' src='../assets/plus.svg' class='w-100 h-100'>"+
+                                      "<input type='file' accept='image/*' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
+                                    "</div>"+
+                                    "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
+                                      "<span>"+item+"</span>" + 
+                                    "</div>" + 
+                                "</div>";
+                      $("#input-variasi-warna").append(res);
+                      $('#warna-input-'+newitem+'').change(function(evt) {
+                        const[file] = $('#warna-input-'+newitem+'').prop('files');
+                        if (file) {
+                          $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
+                        }
+                      });
+                      
+                      $("#input-attr-warna").append(elemukuran(item,newitem));
+                      
+                    }
+                  });
+                  lastColor = check;
+                  if(check.length == 0){
+                    $("#input-variasi-ukuran").hide();
+                  }
+                  }else{
+                    $("#input-harga").show();
+                    $("#warna-input-main").prop('disabled', false);
+                    $("#product-harga").prop('disabled', false);
+                    $("#product-stok").prop('disabled', false);
+                  
+                  }
+                }
+              }); 
+            var autoNumericInstance = new AutoNumeric('#product-harga', AutoNumeric.getPredefinedOptions().numericPos.dotDecimalCharCommaSeparator);
+            
+        });
+
+      </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
@@ -478,30 +623,20 @@
             
             <div class="d-flex py-2">
               <label for="variasi-warna"> Warna (Optional) </label>
-              <select class="selectpicker" id="variasi-warna" name="product-variasi-warna" multiple data-live-search="true">
-                <option> red </option>
-                <option> yellow</option>
-                <option> blue</option>
-                <option> brown</option>
-                <option> orange</option>
-                <option> green</option>
-                <option> violet</option>
-                <option> black</option>
-                <option> carnation pink</option>
-                <option> yellow orange</option>
-                <option> blue green</option>
-                <option> red violet</option>
-                <option> red orange</option>
-                <option> yellow green</option>
-                <option> blue violet</option>
-                <option> white</option>
-                <option> violet red</option>
-                <option> dandelion</option>
-                <option> cerulean</option>
-                <option> apricot</option>
-                <option> scarlet</option>
-                <option> green yellow</option>
-                <option> indigo and gray</option>
+              <select class="selectpicker" id="variasi-warna" name="product-variasi-warna[]" multiple data-live-search="true">
+                <option value="red">red</option>
+                <option value="yellow">yellow</option>
+                <option value="blue">blue</option>
+                <option value="brown">brown</option>
+                <option value="orange">orange</option>
+                <option value="green">green</option>
+                <option value="violet">violet</option>
+                <option value="black">black</option>
+                <option value="white">white</option>
+                <option value="dandelion">dandelion</option>
+                <option value="cerulean">cerulean</option>
+                <option value="apricot">apricot</option>
+                <option value="scarlet">scarlet</option>
               </select>
             </div>
             <hr>
@@ -516,6 +651,7 @@
                   <img id='warna-img-main' src='../assets/plus.svg' class='w-100 h-100'>
                   <input type='file' accept='image/*' name='Gambar[]' id='warna-input-main' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>
                 </div>
+
                 <div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>
                   <span>Main Picture</span>
                 </div> 
@@ -528,14 +664,29 @@
                 <input class="currencyInput form-control validate" type="text" name="product-harga" id="product-harga" placeholder="Masukkan Harga" required>
               </div>
               
-              <label for="product-harga"> Stok : </label>
+              <label for="product-stok"> Stok : </label>
               <div class="input-group mb-3">
                 <input class="form-control validate" type="number" name="product-stok" id="product-stok" placeholder="Masukkan Stok" required>
               </div>
             </div>
             
             
-            <div id="input-variasi-ukuran"></div>
+            <div id="input-variasi-ukuran">
+
+              <table class='table caption-top'>
+                <thead>
+                  <tr>
+                    <th scope='col'>Nama</th>
+                    <th scope='col'>Harga</th>
+                    <th scope='col'>Stok</th>
+                    <th scope='col'>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="input-attr-warna">
+                  
+                </tbody>
+              </table>
+            </div>
 
             <div class="form-group py-2" id="input-berat">
               <label for="product-berat"> Berat : </label>
@@ -557,7 +708,6 @@
       </div>
     </div>
   </div>
-        
             
 </body>
 </html>

@@ -11,7 +11,7 @@ if($status == "SEMUA"){
 }
 
 
-$query = "SELECT * FROM products ". $quer." order by id asc " ;
+$query = "SELECT * FROM products ". $quer." order by id asc" ;
 $stmt = $conn->query($query);
 $allprod = $stmt->fetch_all(MYSQLI_ASSOC);
 $res = "";
@@ -32,28 +32,30 @@ if(count($allprod) > 0){
 
         foreach ($allvariasi as $key => $values) {
             $isActive = ($values["status"] == 0) ? "" : "checked";
+            
             $variasi .= '
                 <tr style="background-color: rgb(243,244,245)">
-                  <td>
+                  <td class="table-secondary">
                     <div class="d-flex">
-                      <a class="d-inline-block position-relative" href="index.php" >
-                        <img src="../Uploads/'.$values["img_path"].'" alt="'.$values["nama"].'" width="56" height="56" >
-                      </a> 
+                      <img class="d-inline-block position-relative" src="../Uploads/'.$values["img_path"].'" alt="'.$values["warna"].'" width="56" height="56" >
                       <b class="d-inline-block align-items-start">'.$values["warna"].'</b>
                     </div>
                   </td>
-                  <td>
-                  '.$values["harga"].'
+                  <td class="table-secondary">
+                  Rp.'.number_format($values["harga"],2).'
                   </td>
-                  <td>
+                  <td class="table-secondary">
                   '.$values["stok"].'
                   </td>
-                  <td>
+                  <td class="table-secondary">
                     <div class="form-switch">
-                      <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" '.$isActive.'>
+                      <input class="form-check-input" type="checkbox" role="switch" id="switchvar-'. $values["id"].'" onchange="onClickChxBox(this)" '.$isActive.'>
                     </div>
                   </td>
-                  <td>
+                  <td class="table-secondary">
+                    <button class="btn" onclick="callback(event,this)" id="deletevar-'. $values["id"].'">
+                        <i class="fas fa-trash-alt"></i> 
+                    </button>
                     
                   </td>
                 </tr>';
@@ -62,14 +64,18 @@ if(count($allprod) > 0){
             $variasi = "<tr>" . $variasi . "</tr>";
         }
         $isMainActive = ($value["status"] == 0) ? "" : "checked";
+        $img_path = "";
+        if(isset($value["img_path"])){
+          $img_path = '
+          <img  class="d-inline-block position-relative" src="../Uploads/'.$value["img_path"].'" alt="'.$value["name"].'" width="56" height="56" >
+        ';
+        }
         $res .= '
         <tr class="spacer">
             <tr>
               <td style="padding-bottom: 1em;"> 
                 <div class="d-flex">
-                  <a class="d-inline-block position-relative" href="index.php" >
-                    <img src="../Uploads/'. $value["img_path"].'" alt="'.$value["name"].'" width="56" height="56" >
-                  </a> 
+                '.$img_path.'
                   <a class="d-inline-block align-items-start" href="index.php">
                     <h5 class="d-block position-relative fw-bold">'.$value["name"].'</h5>
                   </a>
@@ -77,7 +83,7 @@ if(count($allprod) > 0){
               </td>
               <td>
                 <div>
-                  <h5>'. (isset($value["harga"]) ? $value["harga"] : 0) .'</h5>
+                  <h5>'. (isset($value["harga"]) ? 'Rp.'.number_format($value["harga"],2) : '') .'</h5>
                 </div>
               </td>
               <td>
