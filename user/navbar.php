@@ -18,7 +18,7 @@
               <a class="nav-link text-dark" style="letter-spacing: 2px; font-size: 14px;" href="cart.php">CART</a>
             </li>
             <li class="nav-item ms-3">
-              <a href="login.php" class="btn btn-dark rounded-0 p-4 py-2 m-1" style="letter-spacing: 2px; font-size: 12px;">LOGIN</a>
+              <a href="../logout.php" class="btn btn-outline-danger rounded-0 p-4 py-2 m-1" style="letter-spacing: 2px; font-size: 12px;">LOGOUT</a>
             </li>
           </ul>
         </div>

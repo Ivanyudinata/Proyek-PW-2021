@@ -92,7 +92,7 @@
                             console.log(response);
                             var response = JSON.parse(response);
                             if(response.statusCode==200){
-                                location.href = "homeUser.php";						
+                                location.href = "user/index.php";						
                             }else if(response.statusCode==209){
                                 location.href = "admin/index.php";						
                             }else if(response.statusCode==404){
