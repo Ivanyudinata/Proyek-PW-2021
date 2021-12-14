@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2021 at 06:33 PM
--- Server version: 10.4.19-MariaDB
--- PHP Version: 8.0.7
+-- Waktu pembuatan: 14 Des 2021 pada 15.02
+-- Versi server: 10.4.20-MariaDB
+-- Versi PHP: 8.0.9
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,13 +20,13 @@ SET time_zone = "+00:00";
 --
 -- Database: `proyek_pw_2021`
 --
-
+CREATE DATABASE IF NOT EXISTS `proyek_pw_2021` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `proyek_pw_2021`;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cart`
+-- Struktur dari tabel `cart`
 --
 
 DROP TABLE IF EXISTS `cart`;
@@ -39,7 +39,7 @@ CREATE TABLE `cart` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `cart_item`
+-- Struktur dari tabel `cart_item`
 --
 
 DROP TABLE IF EXISTS `cart_item`;
@@ -52,7 +52,7 @@ CREATE TABLE `cart_item` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `customers`
+-- Struktur dari tabel `customers`
 --
 
 DROP TABLE IF EXISTS `customers`;
@@ -70,7 +70,7 @@ CREATE TABLE `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `customers`
+-- Dumping data untuk tabel `customers`
 --
 
 INSERT INTO `customers` (`id`, `nama`, `username`, `password`, `email`, `alamat`, `kota`, `provinsi`, `kodepos`, `image_path`) VALUES
@@ -80,7 +80,7 @@ INSERT INTO `customers` (`id`, `nama`, `username`, `password`, `email`, `alamat`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `discount`
+-- Struktur dari tabel `discount`
 --
 
 DROP TABLE IF EXISTS `discount`;
@@ -96,7 +96,7 @@ CREATE TABLE `discount` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `kategori`
+-- Struktur dari tabel `kategori`
 --
 
 DROP TABLE IF EXISTS `kategori`;
@@ -106,17 +106,20 @@ CREATE TABLE `kategori` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `kategori`
+-- Dumping data untuk tabel `kategori`
 --
 
 INSERT INTO `kategori` (`id`, `nama_kategori`) VALUES
+(13, 'Alat Badminton'),
 (10, 'Alat Beladiri'),
+(11, 'bola'),
+(12, 'gym'),
 (1, 'Pakaian');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `orders`
+-- Struktur dari tabel `orders`
 --
 
 DROP TABLE IF EXISTS `orders`;
@@ -137,7 +140,7 @@ CREATE TABLE `orders` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `order_item`
+-- Struktur dari tabel `order_item`
 --
 
 DROP TABLE IF EXISTS `order_item`;
@@ -152,7 +155,7 @@ CREATE TABLE `order_item` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `payment`
+-- Struktur dari tabel `payment`
 --
 
 DROP TABLE IF EXISTS `payment`;
@@ -167,7 +170,7 @@ CREATE TABLE `payment` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `products`
+-- Struktur dari tabel `products`
 --
 
 DROP TABLE IF EXISTS `products`;
@@ -185,16 +188,19 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `products`
+-- Dumping data untuk tabel `products`
 --
 
 INSERT INTO `products` (`id`, `kategori`, `name`, `description`, `harga`, `qty`, `berat`, `status`, `minimumorder`, `img_path`) VALUES
-(5, 10, 'GASGS', 'HADGAS', '422400.00', 3, 32, 1, 2, '1.png');
+(5, 10, 'GASGS', 'HADGAS', '422400.00', 3, 32, 1, 2, '1.png'),
+(7, 10, 'sarung tinju', 'meninju orang', '0.00', 0, 100, 1, 1, '2.jpg'),
+(8, 12, 'treadmill', 'buat lari', '0.00', 0, 1000000000, 1, 2, '3.png'),
+(9, 13, 'kok', 'untuk bermain badminton', '0.00', 0, 10, 1, 1, '4.png');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `product_review`
+-- Struktur dari tabel `product_review`
 --
 
 DROP TABLE IF EXISTS `product_review`;
@@ -211,7 +217,7 @@ CREATE TABLE `product_review` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `transaction`
+-- Struktur dari tabel `transaction`
 --
 
 DROP TABLE IF EXISTS `transaction`;
@@ -225,7 +231,7 @@ CREATE TABLE `transaction` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `variasiwarna`
+-- Struktur dari tabel `variasiwarna`
 --
 
 DROP TABLE IF EXISTS `variasiwarna`;
@@ -242,7 +248,7 @@ CREATE TABLE `variasiwarna` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wishlist`
+-- Struktur dari tabel `wishlist`
 --
 
 DROP TABLE IF EXISTS `wishlist`;
@@ -257,162 +263,162 @@ CREATE TABLE `wishlist` (
 --
 
 --
--- Indexes for table `cart`
+-- Indeks untuk tabel `cart`
 --
 ALTER TABLE `cart`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `cart_item`
+-- Indeks untuk tabel `cart_item`
 --
 ALTER TABLE `cart_item`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `customers`
+-- Indeks untuk tabel `customers`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `discount`
+-- Indeks untuk tabel `discount`
 --
 ALTER TABLE `discount`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `kategori`
+-- Indeks untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nama_kategori` (`nama_kategori`);
 
 --
--- Indexes for table `orders`
+-- Indeks untuk tabel `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `order_item`
+-- Indeks untuk tabel `order_item`
 --
 ALTER TABLE `order_item`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `payment`
+-- Indeks untuk tabel `payment`
 --
 ALTER TABLE `payment`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `products`
+-- Indeks untuk tabel `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `product_review`
+-- Indeks untuk tabel `product_review`
 --
 ALTER TABLE `product_review`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `transaction`
+-- Indeks untuk tabel `transaction`
 --
 ALTER TABLE `transaction`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `variasiwarna`
+-- Indeks untuk tabel `variasiwarna`
 --
 ALTER TABLE `variasiwarna`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `wishlist`
+-- Indeks untuk tabel `wishlist`
 --
 ALTER TABLE `wishlist`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT untuk tabel yang dibuang
 --
 
 --
--- AUTO_INCREMENT for table `cart`
+-- AUTO_INCREMENT untuk tabel `cart`
 --
 ALTER TABLE `cart`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `cart_item`
+-- AUTO_INCREMENT untuk tabel `cart_item`
 --
 ALTER TABLE `cart_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `customers`
+-- AUTO_INCREMENT untuk tabel `customers`
 --
 ALTER TABLE `customers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `discount`
+-- AUTO_INCREMENT untuk tabel `discount`
 --
 ALTER TABLE `discount`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `kategori`
+-- AUTO_INCREMENT untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT for table `orders`
+-- AUTO_INCREMENT untuk tabel `orders`
 --
 ALTER TABLE `orders`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `order_item`
+-- AUTO_INCREMENT untuk tabel `order_item`
 --
 ALTER TABLE `order_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `payment`
+-- AUTO_INCREMENT untuk tabel `payment`
 --
 ALTER TABLE `payment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `products`
+-- AUTO_INCREMENT untuk tabel `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT for table `product_review`
+-- AUTO_INCREMENT untuk tabel `product_review`
 --
 ALTER TABLE `product_review`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `transaction`
+-- AUTO_INCREMENT untuk tabel `transaction`
 --
 ALTER TABLE `transaction`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `variasiwarna`
+-- AUTO_INCREMENT untuk tabel `variasiwarna`
 --
 ALTER TABLE `variasiwarna`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `wishlist`
+-- AUTO_INCREMENT untuk tabel `wishlist`
 --
 ALTER TABLE `wishlist`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
