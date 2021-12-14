@@ -4,7 +4,7 @@ require_once("../connection.php");
 
 $id = $_POST["id"];
 
-$stmt = $conn->query("SELECT p.id, k.nama_kategori, p.name, p.description, p.harga, p.qty, p.berat, p.status, p.minimumorder, p.img_path FROM products p,kategori k WHERE p.kategori = k.id and p.id='$id'");
+$stmt = $conn->query("SELECT p.id, p.kategori, p.name, p.description, p.harga, p.qty, p.berat, p.status, p.minimumorder, p.img_path FROM products p,kategori k WHERE p.kategori = k.id and p.id='$id'");
 $temp = $stmt->fetch_assoc();
 $arrBarang = $temp;
 

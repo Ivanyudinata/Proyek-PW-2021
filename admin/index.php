@@ -1,20 +1,20 @@
 <?php
     require_once '../connection.php';
-    require_once '../alert.html';
     
     if(isset($_COOKIE['now'])){
       $now = $_COOKIE["now"];
         if($now != "admin"){
-          header("Location: ../user/index.php");
+          header("Location:../user/index.php");
         }
     }else{
-      header("Location: ../index.php");
+      header("Location:../index.php");
     }
 
         
     $stmt = $conn->prepare("SELECT * FROM kategori");
     $stmt->execute();
     $kategori = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    require_once '../alert.html';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,7 +79,7 @@
             status: now
           }, function (response, status, request) {
 
-              }    
+            }    
           );
         }
         
@@ -138,62 +138,80 @@
             $('#addKategori').html('Edit');	
             
             $.ajax({
-                  url: "../controllers/loadProductById.php",
-                  type: "POST",
-                  data: {
-                    id:arr[1]						
-                  },
-                  success: function(response){
-                      console.log(response);
-                      var response = JSON.parse(response);
-                      if(response[1].length > 0){
+              url: "../controllers/loadProductById.php",
+              type: "POST",
+              data: {
+                id:arr[1]						
+              },
+              success: function(response){
+                  console.log(response);
+                  var response = JSON.parse(response);
+                  if(response[1].length > 0){
+                    
+                    $('#product-name').val(response[0]["name"]);
+                    $('#product-deskripsi').val(response[0]["description"]);
+                    $('#product-min-order').val(response[0]["minimumorder"]);
+                    $('#product-berat').val(response[0]["berat"]);
+                    
+                    $("#product-kategori option[value='"+response[0]["kategori"]+"']").attr('selected','selected').change();
+                    
+                    $('#product-kategori').val(response[0]["kategori"]).change();
+                    
+                    var text = $("#product-kategori option[value='"+response[0]["kategori"]+"']").text();
+                    
+                    var arrsd = [];
+                    response[1].forEach(function(item) {
+                      var stat = (item["status"] == 1) ? "checked" : "";
+                      var newelem = elemukuranedit(item["warna"],item["harga"],item["stok"],stat);
+                      $("#input-attr-warna").append(newelem);
+                      var newitem = item["warna"].replace(/\s/g, '');
+                      $("#variasi-warna option[value='"+newitem+"']").prop("selected", true);
+                      arrsd.push(newitem);
+                      lastColor.push(newitem);
+                      res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
+                                "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
+                                  "<img id='warna-img-"+newitem+"' src='../Uploads/"+item["img_path"]+"' class='w-100 h-100'>"+
+                                  "<input type='file' accept='image/*' src='../Uploads/"+item["img_path"]+"' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
+                                "</div>"+
+                                "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
+                                  "<span>"+newitem+"</span>" + 
+                                "</div>" + 
+                            "</div>";
+                      $("#input-variasi-warna").append(res);
+                      $('#warna-input-'+newitem+'').change(function(evt) {
+                        const[file] = $('#warna-input-'+newitem+'').prop('files');
+                        if (file) {
+                          $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
+                        }
                         
-                        $('#product-name').val(response[0]["name"]);
-                        $('#product-deskripsi').val(response[0]["description"]);
-                        $('#product-min-order').val(response[0]["minimumorder"]);
-                        $('#product-berat').val(response[0]["berat"]);
-                        
-                        $("#product-kategori option[value='"+response[0]["nama_kategori"]+"']").prop("selected", true);
-                        
-                        $('#product-kategori').val(response[0]["nama_kategori"]);
-                        var arrsd = [];
-                        response[1].forEach(function(item) {
-                          
-                          var stat = (item["status"] == 1) ? "checked" : "";
-                          var newelem = elemukuranedit(item["warna"],item["harga"],item["stok"],stat);
-                          $("#input-attr-warna").append(newelem);
-                          var newitem = item["warna"].replace(/\s/g, '');
-                          $("#variasi-warna option[value='"+newitem+"']").prop("selected", true);
-                          arrsd.push(newitem);
-                          lastColor.push(newitem);
-                          res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
-                                    "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
-                                      "<img id='warna-img-"+newitem+"' src='../Uploads/"+item["img_path"]+"' class='w-100 h-100'>"+
-                                      "<input type='file' accept='image/*' src='../Uploads/"+item["img_path"]+"' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
-                                    "</div>"+
-                                    "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
-                                      "<span>"+newitem+"</span>" + 
-                                    "</div>" + 
-                                "</div>";
-                          $("#input-variasi-warna").append(res);
-                          $('#warna-input-'+newitem+'').change(function(evt) {
-                            const[file] = $('#warna-input-'+newitem+'').prop('files');
-                            if (file) {
-                              $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
-                            }
-                          });
+                      });
 
-                          $("#input-harga").hide();
-                        });
-                        $("#variasi-warna").val(arrsd);
-                      }else{
+                      $("#input-harga").hide();
+                    });
+                    $("#variasi-warna").val(arrsd);
+                  }else{
 
-                      }
-
-                      $('#addTablesModal').modal('show');
-                      $('#product-add').attr('IDKategori', arr[1]);
-                      
+                    $('#product-name').val(response[0]["name"]);
+                    $('#product-deskripsi').val(response[0]["description"]);
+                    $('#product-min-order').val(response[0]["minimumorder"]);
+                    $('#product-berat').val(response[0]["berat"]);
+                    $('#product-harga').val(response[0]["harga"]);
+                    $('#product-stok').val(response[0]["qty"]);
+                    
+                    
+                    $("#warna-input-main").attr("src","../Uploads/"+response[0]["img_path"]);
+                    $('#warna-img-main').attr("src","../Uploads/"+response[0]["img_path"]);
+                    $("#product-kategori option[value='"+response[0]["kategori"]+"']").attr('selected','selected').change();
+                    
+                    $('#product-kategori').val(response[0]["kategori"]).change();
+                    
+                    var text = $("#product-kategori option[value='"+response[0]["kategori"]+"']").text();
+                    
                   }
+                  
+                  $('#addTablesModal').modal('show');
+                  $('#addBarang').attr('IDKategori', arr[1]);
+                }
               });
           }else if(arr[0] == "delete"){
             $('#btn-Ok').attr('IDProduk', arr[1]);
@@ -272,13 +290,16 @@
 
           $('#addBarang').submit(function(e) {
               e.preventDefault();
+                
+            if($('#addBarang').attr('IDKategori') != null){
+              var id = $(this).attr('IDKategori');
               
+              alert("TESTING");
+            }else{
               $('#addTablesModal').modal('hide');	
               $('body').removeClass('modal-open');
               $('.modal-backdrop').remove();
-                                
               var kam = "";
-
               var form = $('form')[0]; 
               var formData = new FormData(form);
               
@@ -305,14 +326,12 @@
                     
                 }
               });
-
               
+            }
+            
           });
   
           $('#btn-Ok').on('click', function(e) {
-            $('#ConfirmationModal').modal('hide');	
-            $('body').removeClass('modal-open');
-            $('.modal-backdrop').remove();
             
             var id = $(this).attr('IDProduk');
             if(id != null){
@@ -381,6 +400,9 @@
             $("#input-harga").show();
             $("#input-variasi-warna").html('');
             $("#input-attr-warna").html('');
+            if($('#addBarang').attr('IDKategori') != null){
+              $('#addBarang').removeAttr('IDKategori');
+            }
 
             $("#product-kategori").val('default');
             $("#variasi-warna").val('default');
@@ -392,86 +414,84 @@
 
           $('#addTablesModal').on('show.bs.modal', function(e) {
             $("#warna-input-main").prop('disabled', false);
-            $('#warna-img-main').attr('src', '../assets/plus.svg');
+            
           });
           var newnum;
-            $('select').change(function(e) {
-              var selected = $(e.target).val() + "";
-              var check = selected.split(",");
-              if(e.target.id == "variasi-warna"){
-                var res = "";var war = "";
-                warna = check;
-                if(selected != ""){
-                  $("#input-harga").hide();
-                  $("#warna-input-main").val('');
-                  $('#warna-img-main').attr('src', '../assets/plus.svg');
-                  $("#warna-input-main").prop('disabled', true);
-                  $("#product-harga").prop('disabled', true);
-                  $("#product-stok").prop('disabled', true);
+          $('select').change(function(e) {
+            var selected = $(e.target).val() + "";
+            var check = selected.split(",");
+            if(e.target.id == "variasi-warna"){
+              var res = "";var war = "";
+              warna = check;
+              if(selected != ""){
+                $("#input-harga").hide();
+                $("#warna-input-main").val('');
+                $('#warna-img-main').attr('src', '../assets/plus.svg');
+                $("#warna-input-main").prop('disabled', true);
+                $("#product-harga").prop('disabled', true);
+                $("#product-stok").prop('disabled', true);
 
-                  if(lastColor != null){
-                    console.log(lastColor + " Check: " + check);
-                  }
-                  if(lastColor.length > 0){
-                    lastColor.forEach(function(item) {
-                        if(check.indexOf(item) == -1){
-                          if(check.length < lastColor.length ){
-                            var newitem = item.replace(/\s/g, '');
-                            $('#warna-'+newitem+'').remove();
-                            $('#tab-'+newitem+'').remove();
-                          }
+                if(lastColor != null){
+                  console.log(lastColor + " Check: " + check);
+                }
+                if(lastColor.length > 0){
+                  lastColor.forEach(function(item) {
+                      if(check.indexOf(item) == -1){
+                        if(check.length < lastColor.length ){
+                          var newitem = item.replace(/\s/g, '');
+                          $('#warna-'+newitem+'').remove();
+                          $('#tab-'+newitem+'').remove();
                         }
-                      
-                      
+                      }
+                    
+                    
+                  });
+                }
+                check.forEach(function(item) {
+                  var ada = false;
+                  if(lastColor != null){
+                    lastColor.forEach(function(itemColor) {
+                      if(item == itemColor){
+                        ada = true;
+                      }
                     });
                   }
-                  check.forEach(function(item) {
-                    var ada = false;
-                    if(lastColor != null){
-                      lastColor.forEach(function(itemColor) {
-                        if(item == itemColor){
-                          ada = true;
-                        }
-                      });
-                    }
-                    if(!ada){
-                      var newitem = item.replace(/\s/g, '');
-                      res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
-                                    "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
-                                      "<img id='warna-img-"+newitem+"' src='../assets/plus.svg' class='w-100 h-100'>"+
-                                      "<input type='file' accept='image/*' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
-                                    "</div>"+
-                                    "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
-                                      "<span>"+item+"</span>" + 
-                                    "</div>" + 
-                                "</div>";
-                      $("#input-variasi-warna").append(res);
-                      $('#warna-input-'+newitem+'').change(function(evt) {
-                        const[file] = $('#warna-input-'+newitem+'').prop('files');
-                        if (file) {
-                          $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
-                        }
-                      });
-                      
-                      $("#input-attr-warna").append(elemukuran(item,newitem));
-                      
-                    }
-                  });
-                  lastColor = check;
-                  if(check.length == 0){
-                    $("#input-variasi-ukuran").hide();
+                  if(!ada){
+                    var newitem = item.replace(/\s/g, '');
+                    res = "<div id='warna-"+newitem+"' class='card p-0 m-3 border-0' style='width: 6rem'>" +     
+                                  "<div class='w-100 d-flex justify-content align-items-center' style='height: 100px; border: 1px solid red; line-height: 30px;' >"+
+                                    "<img id='warna-img-"+newitem+"' src='../assets/plus.svg' class='w-100 h-100'>"+
+                                    "<input type='file' accept='image/*' name='Gambar[]' id='warna-input-"+newitem+"' style='opacity: 0.0; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height:100%;' required/>"+
+                                  "</div>"+
+                                  "<div class='w-100 bg-danger text-white text-center' style='font-size: 14px;'>"+
+                                    "<span>"+item+"</span>" + 
+                                  "</div>" + 
+                              "</div>";
+                    $("#input-variasi-warna").append(res);
+                    $('#warna-input-'+newitem+'').change(function(evt) {
+                      const[file] = $('#warna-input-'+newitem+'').prop('files');
+                      if (file) {
+                        $('#warna-img-'+newitem+'').attr("src",URL.createObjectURL(file));
+                      }
+                    });
+                    
+                    $("#input-attr-warna").append(elemukuran(item,newitem));
+                    
                   }
-                  }else{
-                    $("#input-harga").show();
-                    $("#warna-input-main").prop('disabled', false);
-                    $("#product-harga").prop('disabled', false);
-                    $("#product-stok").prop('disabled', false);
-                  
-                  }
+                });
+                lastColor = check;
+                if(check.length == 0){
+                  $("#input-variasi-ukuran").hide();
                 }
-              }); 
-            var autoNumericInstance = new AutoNumeric('#product-harga', AutoNumeric.getPredefinedOptions().numericPos.dotDecimalCharCommaSeparator);
-            
+                }else{
+                  $("#input-harga").show();
+                  $("#warna-input-main").prop('disabled', false);
+                  $("#product-harga").prop('disabled', false);
+                  $("#product-stok").prop('disabled', false);
+                
+                }
+              }
+            }); 
         });
 
       </script>
@@ -614,7 +634,7 @@
             </div>
 
             <div class="form-group py-2">
-              <label for="product-harga"> Minimum Pemesanan : </label>
+              <label for="product-min-order"> Minimum Pemesanan : </label>
               <div class="input-group mb-3">
                 <input class="form-control validate" type="number" name="product-min-order" id="product-min-order" placeholder="Masukkan Minimum Pemesanan" required>
               </div>
@@ -661,7 +681,7 @@
                 <div class="input-group-prepend">
                   <span class="input-group-text">Rp.</span>
                 </div>
-                <input class="currencyInput form-control validate" type="text" name="product-harga" id="product-harga" placeholder="Masukkan Harga" required>
+                <input class="form-control validate" type="number" name="product-harga" id="product-harga" placeholder="Masukkan Harga" required>
               </div>
               
               <label for="product-stok"> Stok : </label>
