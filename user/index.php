@@ -1,4 +1,6 @@
-<?php include 'header.php' ?>
+<?php 
+include 'header.php';
+?>
 
 <div class="container-fluid m-0 p-0">
 
@@ -7,7 +9,7 @@
     <div class="w-100 bg-dark pb-4">
         <div class="row container mx-auto p-3 row-cols-5 w-100">
             <div class="w-100 my-3 text-center">
-                <h5 class="fw-lighter color-gold" style="letter-spacing: 2px;">POPULAR PRODUCTS</h5>
+                <h5 class="fw-lighter color-gold" style="letter-spacing: 2px;">RANDOM PRODUCTS</h5>
             </div>
 
             <div class="col">
