@@ -1,5 +1,15 @@
 <?php 
 include 'header.php';
+if(isset($_COOKIE['now'])){
+    $now = $_COOKIE["now"];
+    if($now == "admin"){
+        header("Location:../admin/index.php");
+    }else{
+
+    }
+}else{
+    header("Location:../index.php");
+}
 ?>
 
 <div class="container-fluid m-0 p-0">

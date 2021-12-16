@@ -1,7 +1,18 @@
 <?php 
     include 'header.php';
-    require_once '../connection.php';   
+    require_once '../connection.php';  
+    require_once '../alert.html'; 
         
+    if(isset($_COOKIE['now'])){
+        $now = $_COOKIE["now"];
+        if($now == "admin"){
+            header("Location:../admin/index.php");
+        }else{
+
+        }
+    }else{
+        header("Location:../index.php");
+    }
     if(isset($_GET["id"])){
 
         $id = $_GET["id"];
@@ -112,7 +123,7 @@
                         ?>
 
                 <h5>Pilih Varian</h5>
-                <select class="form-select fw-light" aria-label="Default select example">
+                <select id="variasi-warna" class="form-select fw-light" aria-label="Default select example">
                         <?php
                         foreach($allvarian as $key => $value ){
                             ?>
@@ -135,7 +146,56 @@
     <script>
     $(document).ready(function() {
         $("#addToCart").on('click', function() {
-            alert(this.html);
+            var nows = $("#variasi-warna").val();
+            if(nows == null){
+                var idprod = <?php echo json_encode($id); ?>;
+                var iduser = <?php echo json_encode($now); ?>;
+                $.ajax({
+                  url: "../controllers/addToCart.php",
+                  type: "POST",
+                  data: {
+                    type: "PRODUK",
+                    idproduk: idprod,
+                    iduser: iduser
+                  },
+                  success: function(response){
+                      var response = JSON.parse(response);
+                      if(response.statusCode==200){
+                          $('#error').html('item sukses ditambahkan!');
+                          $('#header').html('Sukses');
+                          $('#myModal').modal('show');	
+                      }else if(response.statusCode==209){
+                          $('#error').html('Error item tidak dapat ditambahkan!');
+                          $('#header').html('Error');
+                          $('#myModal').modal('show');						
+                      }
+                  }
+                });
+            }else{
+                var idprod = nows;
+                var iduser = <?php echo json_encode($now); ?>;
+                $.ajax({
+                  url: "../controllers/addToCart.php",
+                  type: "POST",
+                  data: {
+                    type: "VARIAN",
+                    idproduk: idprod,
+                    iduser: iduser
+                  },
+                  success: function(response){
+                      var response = JSON.parse(response);
+                      if(response.statusCode==200){
+                          $('#error').html('item sukses ditambahkan!');
+                          $('#header').html('Sukses');
+                          $('#myModal').modal('show');	
+                      }else if(response.statusCode==209){
+                          $('#error').html('Error item tidak dapat ditambahkan!');
+                          $('#header').html('Error');
+                          $('#myModal').modal('show');						
+                      }
+                  }
+                });
+            }
         });
         $('select').on('change', function() {
             var idkat = this.value;
@@ -148,8 +208,6 @@
                     $("#main-photo-product").attr('src',"../Uploads/"+item.img_path);
                     $("#produk-harga").html("Rp " + Number(item["harga"]).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
                     $("#produk-nama").html(barang["name"]);
-                    
-                    
                 }
             });
         });
