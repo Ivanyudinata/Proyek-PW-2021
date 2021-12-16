@@ -332,7 +332,7 @@
           });
   
           $('#btn-Ok').on('click', function(e) {
-            
+            $('#ConfirmationModal').hide();	
             var id = $(this).attr('IDProduk');
             if(id != null){
               $.ajax({
@@ -346,6 +346,7 @@
                       console.log(response);
                       var response = JSON.parse(response);
                       if(response.statusCode==200){
+                          $('.modal-backdrop').remove();
                           $('#error').html('Berhasil Dihapus!');
                           $('#header').html('Success');
                           $('#myModal').modal('show');	
@@ -353,7 +354,8 @@
                       }else if(response.statusCode==209){
                           $('#error').html('Gagal Dihapus!');
                           $('#header').html('Error');
-                          $('#myModal').modal('show');						
+                          $('#myModal').modal('show');		
+                          $('.modal-backdrop').remove();				
                       }
                       
                   }

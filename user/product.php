@@ -117,6 +117,7 @@
                     
                         <button class="btn btn-dark w-100 mt-3">Beli Langsung</button>
                         <button id="addToCart" class="btn btn-outline-success mt-2 w-100">Masukkan Keranjang</button>
+                        <button id="addToWishlist" class="btn btn-outline-success mt-2 w-100">Add to Wishlist</button>
                 <?php
                         
                     }else{
@@ -133,8 +134,9 @@
                         ?>
                                 
                         </select>
-                        <button class="btn btn-dark w-100 mt-3">Beli Langsung</button>
+                        <button id="bayar" class="btn btn-dark w-100 mt-3">Beli Langsung</button>
                         <button id="addToCart" class="btn btn-outline-success mt-2 w-100">Masukkan Keranjang</button>
+                        <button id="addToWishlist" class="btn btn-outline-success mt-2 w-100">Add to Wishlist</button>
                         <?php
                     }
                 ?>
@@ -145,6 +147,44 @@
     </div>
     <script>
     $(document).ready(function() {
+        
+        $('#addToWishlist').on('click', function(e) {
+            
+        });
+        $('#bayar').on('click', function(e) {
+            var idprod = <?php echo json_encode($id); ?>;
+            $.ajax({
+                url: "../controllers/paymentsatubarang.php",
+                type: "POST",
+                data:{
+                    id: idprod,
+                },
+                success: function(response){
+                    console.log(response);
+                    var response = JSON.parse(response);
+                    var token = response.SnapToken;
+                    snap.pay(token, {
+                        onSuccess: function(result) {
+                            window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                        },
+                        onPending: function(result) {
+                            window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                        },
+                        onError: function(result) {
+                            window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                        },
+                        onClose: function(result) {
+                            window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                        }
+                    });
+                        
+                    
+                }
+            });
+            
+        });
+    
+
         $("#addToCart").on('click', function() {
             var nows = $("#variasi-warna").val();
             if(nows == null){

@@ -1,9 +1,14 @@
 <?php 
 
+    namespace Midtrans;
+    
     include 'header.php';
     require_once '../connection.php';  
     require_once '../alert.html'; 
 
+    require_once dirname(__DIR__,1) . '\midtrans\midtrans-php\Midtrans.php';
+    Config::$clientKey = 'SB-Mid-client-IZTGPkzRSyrlUwxH'; 
+    
     if(isset($_COOKIE['now'])){
         $now = $_COOKIE["now"];
         if($now == "admin"){
@@ -24,6 +29,7 @@
     $allitem = $stmt->fetch_all(MYSQLI_ASSOC);
     $totharga = 0;
 ?>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?php echo Config::$clientKey;?>"></script>
 
 <div class="container-fluid m-0 p-0">
 
@@ -86,10 +92,44 @@
                     <small>Rp. <?= number_format($totharga,2) ?></small>
                 </div>
                 <input type="text" name="" id="" class="form-control fw-light" placeholder="Kode Promo">
-                <button class="btn w-100 btn-dark mt-3">Bayar Sekarang</button>
+                <button id="bayar" class="btn w-100 btn-dark mt-3">Bayar Sekarang</button>
             </div>
         </div>
     </div>
     
+    <script>
+    
+    $('#btn-Ok').on('change', function(e) {
+        
+    });
+    $('#bayar').on('click', function(e) {
+        $.ajax({
+            url: "../controllers/payment.php",
+            type: "POST",
+            success: function(response){
+                console.log(response);
+                var response = JSON.parse(response);
+                var token = response.SnapToken;
+                snap.pay(token, {
+                    onSuccess: function(result) {
+                        window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                    },
+                    onPending: function(result) {
+                        window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                    },
+                    onError: function(result) {
+                        window.location.href = "index.php?Status="+ result["status_code"] + "&OrderId=" + result["order_id"] + "&Payment=" + result["payment_type"] + "&Message=" + result["status_message"];
+                    },
+                    onClose: function(result) {
 
+                    }
+                });
+                    
+                
+            }
+        });
+        
+    });
+    
+</script>
 </div>

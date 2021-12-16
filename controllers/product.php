@@ -83,12 +83,11 @@ if($_POST["type"] == "ADD"){
                 $new_str = str_replace(' ', '', $arrwarna[$key]);
                 $namafile = uploadImage($arrGambar,$idnow."-".$new_str,$key);
                 if($namafile != ""){
-                    $statnow = ($arrStatus[$key] == "on") ? 1 : 0;
+                    $statnow = 1;
                     $stoknow = $arrStok[$key];
                     $harganow = preg_replace('/[^0-9]/', '', $arrHarga[$key]);
                     $warnanow = $arrwarna[$key];
                     $query= "INSERT INTO `variasiwarna`(`product_id`, `warna`, `harga`, `stok`, `img_path`, `status`) VALUES ('$last_id','$warnanow','$harganow','$stoknow','$namafile','$statnow')";
-                    echo ($query);     
                     if ($conn->query($query) != TRUE) {
                         break;
                         $sukses = false;
